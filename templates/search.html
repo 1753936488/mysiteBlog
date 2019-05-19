@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}
+    <title>我的网站|搜索</title>
+{% endblock %}
+
+{% block nav_home_active %}
+active
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                {% if search_word == '' %}
+                    <h3>你没有搜索任何内容</h3>
+                    <p>你可以尝试输入点什么东西,例如:django</p>
+                    {% else %}
+                    <h3>搜索“{{ search_word }}”,找到{{ search_blogs_count }}个结果</h3>
+                    <hr>
+                    {% for blog in search_blogs %}
+                        <a href="{% url 'blog_detail' blog.pk%}">
+                            <h4>{{ blog.title }}</h4>
+                        </a>
+                        <p>{{ blog.content | striptags | truncatechars_html:100 }}</p>
+                    {% empty %}
+                        <p>没有找到任何内容,换个关键字再来试试吧</p>
+                    {% endfor %}
+{#                      <div class="ui pagination menu">#}
+{#                        {% if page_of_blog.has_previous %}#}
+{#                            <a class="item" href="?p={{ page_of_blog.previous_page_number }}&wd={{ search_word }}">Previous</a>#}
+{#                        {% endif %}#}
+{#                        {% for i in page_range %}#}
+{#                            {% if i == page_of_blog.number %}#}
+{#                                <a class="active item" href="?p={{ i }}&wd={{ search_word }}" >{{ i }}</a>#}
+{#                            {% elif i == '...' %}#}
+{#                                <div class="disabled item">{{ i }}</div>#}
+{#                            {% else %}#}
+{#                                <a class="item" href="?p={{ i }}&wd={{ search_word }}">{{ i }}</a>#}
+{#                            {% endif %}#}
+{#                        {% endfor %}#}
+{#                        {% if page_of_blog.has_next %}#}
+{#                            <a class="item" href="?p={{ page_of_blog.next_page_number }}&wd={{ search_word }}">Next</a>#}
+{#                        {% endif %}#}
+{#                        <a class="disabled item">Page <span style="font-size: 20px;">{{ page_of_blog.number }}</span> of {{ page_of_blog.paginator.num_pages }}</a>#}
+{#                    </div>#}
+                    <div aria-label="Page navigation">
+                        <ul class="pagination">
+                        {% if page_of_blog.has_previous %}
+                            <li><a class="item" href="?p={{ page_of_blog.previous_page_number }}&wd={{ search_word }}">Previous</a></li>
+                        {% endif %}
+                        {% for i in page_range %}
+                            {% if i == page_of_blog.number %}
+                                <li class="active" ><a href="?p={{ i }}&wd={{ search_word }}" >{{ i }}</a></li>
+                            {% elif i == '...' %}
+                                <li class="disabled"><a >{{ i }}</a></li>
+                            {% else %}
+                                <li><a class="item" href="?p={{ i }}&wd={{ search_word }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_of_blog.has_next %}
+                            <li><a class="item" href="?p={{ page_of_blog.next_page_number }}&wd={{ search_word }}">Next</a></li>
+                        {% endif %}
+                            <li class="disabled"><a>Page {{ page_of_blog.number }} of {{ page_of_blog.paginator.num_pages }}</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

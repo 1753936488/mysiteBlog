@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+{#    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>#}
+    <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+
+
+    {% block title %}
+
+    {% endblock %}
+
+    {% block css %}
+
+    {% endblock %}
+
+
+<body>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'home' %}">个人博客网站</a>
+                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                 </button>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                 <ul class="nav navbar-nav">
+                    <li class="{% block nav_home_active %}{% endblock %}"><a href="{% url "home" %}">首页</a></li>
+                    <li class="{% block nav_blog_active %}{% endblock %}"><a href="{% url "blog_list"%}">博客</a></li>
+                 </ul>
+                 <ul class="nav navbar-nav navbar-right">
+                     {% if not user.is_authenticated %}
+                         <li>
+                             {% if request.GET.from %}
+                                 <a href="{% url 'login' %}?from={{ request.GET.from }}">登陆</a>
+                             {% else %}
+                                 <a href="{% url 'login' %}?from={{ request.get_full_path }}">登陆</a>
+                             {% endif %}
+                         </li>
+                         <li>
+                             {% if request.GET.from %}
+                                 <a href="{% url 'register' %}?from={{ request.GET.from }}">注册</a>
+                             {% else %}
+                                 <a href="{% url 'register' %}?from={{ request.get_full_path }}">注册</a>
+                             {% endif %}
+
+                         </li>
+                     {% else %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                                 aria-expanded="false">{{ user.get_nickname_or_username }} <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                            <li><a href="{% url 'user_info' %}">个人资料</a></li>
+                              <li> <a href="{% url 'change_password' %}?from={{ request.get_full_path }}">修改密码</a></li>
+                            {% if user.is_staff or user.is_superuser %}
+                                <li><a href="{% url 'admin:index' %}">后台管理</a></li>
+                            {% endif %}
+                            <li><a href="{% url 'logout' %}?from={{ request.get_full_path }}">退出</a></li>
+
+                      </ul>
+                    </li>
+                     {% endif %}
+                 <li>
+                     <form class="navbar-form search-form"  action="{% url 'search' %}">
+                        <div class="form-group">
+                          <input type="text" name="wd" class="form-control" placeholder="Search">
+                        </div>
+                    <button type="submit" class="btn btn-default">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                  </form>
+                 </li>
+                 </ul>
+            </div>
+
+        </div>
+    </div>
+
+
+    {% block content %}
+
+    {% endblock %}
+
+    <div class="footer">
+        <div class="website-info">
+            <p>© 2019-2020 godyao.club 版权所有 ICP证:湘ICP备19008162号 </p>
+            <p> 意见反馈或联系我(godyao0801@qq.com) </p>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+        <div class="modal fade" id="login_modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog modal-sm" role="document">
+          <form id="login_modal_form" method="POST" action="{% url 'login_for_modal' %}">
+          {% csrf_token %}
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">登陆界面</h4>
+                  </div>
+                  <div class="modal-body">
+                    {% for field in login_modal_form %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                    {% endfor %}
+                     <span id="login_modal_tip" class="text-danger"></span>
+                  </div>
+
+                  <div class="modal-footer">
+                      <a class="pull-left" href="{% url 'register' %}">还没账号？去注册</a>
+                      <button type="submit" id="embed-submit" class="btn btn-primary">登陆</button>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                  </div>
+            </div>
+          </form>
+          </div>
+        </div>
+
+        <script type="text/javascript">
+                    //底部栏置底
+            //窗体改变大小事件
+            $(window).resize(function(){
+                //正文高度
+                var body_height = $(document.body).outerHeight(true);
+                //底部元素高度
+                var bottom_height = $(".footer").outerHeight(true);
+                //浏览器页面高度
+                var window_height = $(window).height();
+                //判断并调整底部元素的样式
+                if($(".footer").hasClass('page-bottom')){
+
+                    //若包含有page-bottom类，就应用了position设置
+                    //当position为absolute时，body高度不包含这个元素
+                    //所以页面高度需要判断body和footer之和若小于浏览器窗口
+                    //则移除样式，让footer自然跟随在正文后面
+                    if(body_height + bottom_height >= window_height){
+
+                        $(".footer").removeClass('page-bottom');
+                    }
+
+                }else{
+                    //若没有page-bottom类，body高度包含footer
+                    //判断body高度小于浏览器时，则悬浮于底部
+                    if(body_height < window_height){
+
+                        $(".footer").addClass('page-bottom');
+                    }
+                }
+            });
+            //页面加载时，模拟触发一下resize事件
+            $(window).trigger('resize');
+
+
+            $("#login_modal_form").submit(function () {
+            $.ajax({
+                url: '{% url 'login_for_modal' %}',
+                type: 'POST',
+                data: $(this).serialize(),
+                cache: 'false',
+                success: function (data) {
+                    if (data['status'] == 'SUCCESS') {
+                        window.location.reload();
+                    } else {
+                        $("#login_modal_tip").text('用户名或密码错误!!!');
+                    }
+                }
+            });
+                return false;
+            });
+        </script>
+
+{% block js %}
+    <script>
+    $("#login_modal_form").submit(function () {
+    $.ajax({
+        url: '{% url 'login_for_modal' %}',
+        type: 'POST',
+        data: $(this).serialize(),
+        cache: 'false',
+        success: function (data) {
+            if (data['status'] == 'SUCCESS') {
+                window.location.reload();
+            } else {
+                $("#login_modal_tip").text('用户名或密码错误!!!');
+            }
+        }
+    });
+    return false;
+});
+</script>
+{% endblock %}
+
+</body>
+</html>

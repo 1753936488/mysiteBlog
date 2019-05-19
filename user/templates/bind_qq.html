@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load user_tags %}
+{% block title %}
+    <title>我的网站|绑定QQ</title>
+{% endblock %}
+
+{% block nav_home_active %}
+active
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+            {% if not user.is_authenticated %}
+                <div style="margin:0 auto;text-align: center;">
+                    <img style="border-radius: 50%;" src="{{ avatar }}" >
+                    <p>你好, {{ nickname }}</p>
+                </div>
+                <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">绑定</h3>
+                </div>
+                <div class="panel-body">
+                     <form method="POST" id="login_form" action="{% url 'bind_qq' %}">
+                        {% csrf_token %}
+                        {% for field in bind_qq_form %}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            <p class="text-danger">{{ field.errors.as_text }}</p>
+                        {% endfor %}
+                            <div id="embed-captcha"></div>
+                            <p id="wait" class="show">正在加载验证码......</p>
+                            <p id="notice" class="hide">请先拖动验证码到相应位置</p>
+                            <br>
+                            <a href="{% url 'forgot_password' %}?from={{ request.get_full_path }}">忘记密码</a>&nbsp;|
+                            <a href="{% url 'register' %}">注册</a>
+                            <input type="submit" id="embed-submit" value="绑定" class="btn btn-primary pull-right">
+                            <span id="tip" class="pull-left text-danger">{{ bind_qq_form.non_field_errors }}</span>
+{#                            <input type="submit" id="popup-submit" value="登陆" class="btn btn-primary pull-right">#}
+{#                     <div id="popup-captcha"></div>#}
+                    </form>
+
+                </div>
+            </div>
+                <a href="{% url 'create_user_by_qq' %}?nickname={{ nickname }}">没有账号?直接登陆并创建账号 &gt; &gt;</a>
+            {% else %}
+                <span>已登录,跳转到首页...</span>
+                <script>window.location.href=('/');</script>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <!-- 引入封装了failback的接口--initGeetest -->
+    <script src="//static.geetest.com/static/tools/gt.js"></script>
+
+<script>
+    var handlerEmbed = function (captchaObj) {
+        $("#embed-submit").click(function (e) {
+            var validate = captchaObj.getValidate();
+            if (!validate) {
+                $("#notice")[0].className = "show";
+                setTimeout(function () {
+                    $("#notice")[0].className = "hide";
+                }, 2000);
+                e.preventDefault();
+            }
+        });
+        // 将验证码加到id为captcha的元素里
+        captchaObj.appendTo("#embed-captcha");
+        captchaObj.onReady(function () {
+            $("#wait")[0].className = "hide";
+        });
+        // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+    };
+    $.ajax({
+        // 获取id，challenge，success（是否启用failback）
+        url: "{% url 'get_captcha' %}?t=" + (new Date()).getTime(), // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 使用initGeetest接口
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                product: "embed", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+            }, handlerEmbed);
+        }
+    });
+</script>
+{% endblock %}

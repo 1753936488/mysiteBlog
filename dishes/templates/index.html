@@ -1,0 +1,435 @@
+{% load  static %}
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="icon" href="">
+
+<title>{% block title %}首页{% endblock %}</title>
+
+<!-- Bootstrap core CSS -->
+<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<!-- Custom styles for this template -->
+<link href="https://v3.bootcss.com/examples/dashboard/dashboard.css" rel="stylesheet">
+{% block css %}
+{% endblock %}
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{% url 'index' %}">无敌订餐推荐平台</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#" data-toggle="modal" data-target="#myModal">订单</a></li>
+            <li><a href="{% url 'pickleMyHeaderTable' %}" >更新模型</a></li>
+
+          </ul>
+          <form class="navbar-form navbar-right" id="search-form">
+            <input type="text" class="form-control" placeholder="Search...">
+            <button type="submit" class="btn btn-default">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="myModalLabel">订单</h4>
+	      </div>
+	      <div class="modal-body">
+	        <ul class="list-group" id="modal-order">
+
+			</ul>
+			总计：<span class="text-danger" id="total-price"></span>元
+              <div class="pull-right">姓名: <input id="name" type="text" placeholder="请输入姓名"></div>
+              <span class="text-danger" id="danger"></span>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary" id="submit_order">提交订单</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar" style="width:15%";>
+
+            <div class="panel-group" role="tablist">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="collapseListGroupHeading1">
+						<h4 class="panel-title text-center" >
+							<a class="" role="button" data-toggle="collapse" href="#collapseListGroup1" aria-expanded="true" aria-controls="collapseListGroup1">
+								婚宴
+							</a>
+						</h4>
+					</div>
+					<div id="collapseListGroup1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading1" aria-expanded="true" style="">
+						<ul class="list-group">
+                            {% for item in hunyan %}
+                                <li class="list-group-item text-center" ><a onclick="getPackage({{ item.pk }})">{{ item.PackageName }}</a>&nbsp;&nbsp;<span style="color: red;">{{ item.Price }}元</span></li>
+                            {% empty %}
+                            <li style="color: red;font-size: 1.2em;text-align: center;list-style: none">暂无数据</li>
+                            {% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+        <div class="panel-group" role="tablist">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="collapseListGroupHeading10">
+						<h4 class="panel-title text-center" >
+							<a class="" role="button" data-toggle="collapse" href="#collapseListGroup10" aria-expanded="true" aria-controls="collapseListGroup10">
+								寿宴
+							</a>
+						</h4>
+					</div>
+					<div id="collapseListGroup10" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading10" aria-expanded="true" style="">
+						<ul class="list-group">
+                            {% for item in shouyan %}
+                                <li class="list-group-item text-center" ><a onclick="getPackage({{ item.pk }})">{{ item.PackageName }}</a>&nbsp;&nbsp;<span style="color: red;">{{ item.Price }}元</span></li>
+                                {% empty %}
+                                <li style="color: red;font-size: 1.2em;text-align: center;list-style: none">暂无数据</li>
+                            {% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+        <div class="panel-group" role="tablist">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="collapseListGroupHeading11">
+						<h4 class="panel-title text-center" >
+							<a class="" role="button" data-toggle="collapse" href="#collapseListGroup11" aria-expanded="true" aria-controls="collapseListGroup11">
+								商务宴
+							</a>
+						</h4>
+					</div>
+					<div id="collapseListGroup11" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading11" aria-expanded="true" style="">
+						<ul class="list-group">
+                             {% for item in shangwu %}
+                                <li class="list-group-item text-center" ><a onclick="getPackage({{ item.pk }})">{{ item.PackageName }}</a>&nbsp;&nbsp;<span style="color: red;">{{ item.Price }}元</span></li>
+                                {% empty %}
+                                <li style="color: red;font-size: 1.2em;text-align: center;list-style: none">暂无数据</li>
+                            {% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+        <div class="panel-group" role="tablist">
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="collapseListGroupHeading12">
+						<h4 class="panel-title text-center" >
+							<a class="" role="button" data-toggle="collapse" href="#collapseListGroup12" aria-expanded="true" aria-controls="collapseListGroup12">
+								朋友聚会宴
+							</a>
+						</h4>
+					</div>
+					<div id="collapseListGroup12" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading12" aria-expanded="true" style="">
+						<ul class="list-group">
+                             {% for item in pengyou %}
+                                <li class="list-group-item text-center" ><a onclick="getPackage({{ item.pk }})">{{ item.PackageName }}</a>&nbsp;&nbsp;<span style="color: red;">{{ item.Price }}元</span></li>
+                                {% empty %}
+                                <li style="color: red;font-size: 1.2em;text-align: center;list-style: none">暂无数据</li>
+                            {% endfor %}
+						</ul>
+					</div>
+				</div>
+			</div>
+         	<div class="panel-group" role="tablist">
+         	<div class="panel panel-default">
+         		<div class="panel-heading" role="tab" id="collapseListGroupHeading14">
+         			<h4 class="panel-title text-center" >
+         				<a class="" role="button" data-toggle="collapse" href="#collapseListGroup14" aria-expanded="true" aria-controls="collapseListGroup14">
+         					家宴
+         				</a>
+         			</h4>
+         		</div>
+         		<div id="collapseListGroup14" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading14" aria-expanded="true" style="">
+         			<ul class="list-group">
+         				 {% for item in jiayan %}
+                            <li class="list-group-item text-center" ><a onclick="getPackage({{ item.pk }})">{{ item.PackageName }}</a>&nbsp;&nbsp;<span style="color: red;">{{ item.Price }}元</span></li>
+                            {% empty %}
+                           <li style="color: red;font-size: 1.2em;text-align: center;list-style: none">暂无数据</li>
+                        {% endfor %}
+         			</ul>
+
+         		</div>
+         	</div>
+         </div>
+            <div class="panel-group" role="tablist">
+            	<div class="panel panel-default">
+            		<div class="panel-heading" role="tab" id="collapseListGroupHeading3">
+            			<h4 class="panel-title text-center" >
+            				<a class="" role="button" data-toggle="collapse" href="#collapseListGroup3" aria-expanded="true" aria-controls="collapseListGroup3">
+            					菜系推荐
+            				</a>
+            			</h4>
+            		</div>
+            		<div id="collapseListGroup3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading3" aria-expanded="true" style="">
+            			<ul class="list-group">
+                            {% for item in dType %}
+                                <li class="list-group-item text-center" ><a onclick="getInfo({{ item.pk }})">{{ item.type }}</a></li>
+                            {% empty %}
+                            <li style="color: red;font-size: 1.2em;text-align: center;list-style: none">暂无数据</li>
+                            {% endfor %}
+
+            			</ul>
+
+            		</div>
+            	</div>
+            </div>
+            <div class="panel-group" role="tablist">
+						  	<div class="panel panel-default">
+						  		<div class="panel-heading" role="tab" id="collapseListGroupHeading4">
+						  			<h4 class="panel-title text-center" >
+						  				<a class="" role="button" data-toggle="collapse" href="#collapseListGroup4" aria-expanded="true" aria-controls="collapseListGroup4">
+						  					菜型推荐
+						  				</a>
+						  			</h4>
+						  		</div>
+						  		<div id="collapseListGroup4" class="panel-collapse collapse" role="tabpanel" aria-labelledby="collapseListGroupHeading4" aria-expanded="true" style="">
+						  			<ul class="list-group">
+                                        {% for item in category %}
+                                            <li class="list-group-item text-center" ><a onclick="getCategory({{ item.pk }})">{{ item.category }}</a></li>
+                                        {% empty %}
+                                        暂无数据
+                                        {% endfor %}
+						  			</ul>
+
+						  		</div>
+						  	</div>
+						  </div>
+        </div>
+      </div>
+    </div>
+
+{#        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">#}
+{##}
+{#          <div class="row placeholders" id="dd">#}
+{#               <div id="container" style="width: 800px;height:600px;"></div>#}
+{#              <br>#}
+{#              <hr>#}
+{#              <div class="row placeholders" id="cc">#}
+{#               <div id="container" style="width: 800px;height:600px;">adada</div>#}
+    <div class="container-fluid">
+		<div class="row">
+			<div class="col-sm-8" style="height:900px;overflow:scroll;" id="dd">
+
+				<hr>
+        </div>
+
+    <div class="col-sm-4 blog-sidebar">
+        <div class="header text-center" style="font-size: 2em;color: red;">推荐菜品</div>
+        <hr>
+        <div class="sidebar-module"style="height:818px;overflow: scroll;" id="cc">
+    </div>
+    <!-- 引入 highcharts.js -->
+    <script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
+    <script>
+        // 图表配置
+        var options = {
+            chart: {
+                type: 'bar'                          //指定图表的类型，默认是折线图（line）
+            },
+            title: {
+                text: '我的第一个图表'                 // 标题
+            },
+            xAxis: {
+                categories: ['苹果', '香蕉', '橙子']   // x 轴分类
+            },
+            yAxis: {
+                title: {
+                    text: '吃水果个数'                // y 轴标题
+                }
+            },
+            series: [{                              // 数据列
+                name: '小明',                        // 数据列名
+                data: [1, 0, 4]                     // 数据
+            }, {
+                name: '小红',
+                data: [5, 7, 3]
+            }]
+        };
+        // 图表初始化函数
+        var chart = Highcharts.chart('container', options);
+    </script>
+            </div>
+
+          </div>
+
+
+
+      </div>
+    </div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script>window.jQuery || document.write('<script src="{% static 'js/jquery.min.js' %}">')</script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</div>
+
+</body>
+<script>
+    function getInfo(url){
+        url = 'getType?pk='+url;
+            $.ajax({
+            url:url,
+            type:'get',
+            datatype:'json',
+            success:function(data){
+                if(data.status=='ok'){
+                    if(data.data.length!=0){
+                            var htmls = '';
+                            $.each(data.data,function (index,value) {
+                                htmls+='<div class="col-xs-6 col-sm-3 placeholder">'+
+                        '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
+                        '<h4>'+value.dishName+'</h4>'+
+                        '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
+                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                      '</div>'
+                            })
+                    }else{
+                        var htmls = '暂无数据';
+                    }
+                    $("#dd").html(htmls);
+                }
+            }
+        })
+    };
+    function getCategory(url){
+        url = 'getCategory?pk='+url;
+            $.ajax({
+            url:url,
+            type:'get',
+            datatype:'json',
+            success:function(data){
+                if(data.status=='ok'){
+                    if(data.data.length!=0){
+                            var htmls = '';
+                            $.each(data.data,function (index,value) {
+                                htmls+='<div class="col-xs-6 col-sm-3 placeholder">'+
+                        '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
+                        '<h4>'+value.dishName+'</h4>'+
+                        '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
+                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                      '</div>'
+                            })
+                    }else{
+                        var htmls = '暂无数据';
+                    }
+                    $("#dd").html(htmls);
+                }
+            }
+        })
+    };
+    function getPackage(url){
+        url = 'getPackage?pk='+url;
+            $.ajax({
+            url:url,
+            type:'get',
+            datatype:'json',
+            success:function(data){
+                if(data.status=='ok'){
+                    if(data.data.length!=0){
+                            var htmls = '';
+                            $.each(data.data,function (index,value) {
+                                console.log(index,value.dishName);
+                                htmls+='<div class="col-xs-6 col-sm-3 placeholder">'+
+                        '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
+                        '<h4>'+value.dishName+'</h4>'+
+                        '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
+                                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                      '</div>'
+                            })
+                    }else{
+                        var htmls = '暂无数据';
+                    }
+                    $("#dd").html(htmls);
+                }
+            }
+        })
+    };
+    function recommend(id) {
+        $.ajax({
+            url:'recommend?pk='+id,
+            type: 'get',
+            datatype: 'json',
+            success:function (data) {
+                if(data.status == 'ok'){
+                    // 获取到推荐的标签
+                    if(data.recommend.length!=0){
+                            var $li = '<li class="list-group-item">'+data.data.dishName+'<span class="text-danger pull-right price">'+data.data.price+'元</span></li>';
+                            $("#modal-order").append($li);
+                            var $price = $(".price");
+                            var total = 0;
+                            $.each($price,function (index,value) {
+                                var price = value.innerText.split('元')[0];
+                                total += parseInt(price);
+                            })
+                            $("#total-price").html(total);
+                            var htmls = '';
+                            $.each(data.recommend,function (index,value) {
+                                htmls+='<div class="col-xs-6 col-sm-3 placeholder">'+
+                        '<img src="'+value.img+'" width="100" height="100" alt="图片不见了">'+
+                        '<h4>'+value.dishName+'</h4>'+
+                        '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
+                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                      '</div>'
+                            });
+
+                    }else{
+                        var htmls = '暂无数据';
+                    }
+                    $("#cc").html(htmls);
+
+
+                }
+            }
+        })
+    }
+    $("#submit_order").click(function () {
+        var name = $("#name").val();
+        if(name.length==0){
+            $("#danger").text('请输入姓名!!');
+            return false;
+        }
+        $.ajax({
+            url: 'submitOrder?name='+name,
+            type: 'get',
+            datatype: 'json',
+            success:function(data){
+                if(data.status=='ok'){
+                    alert('操作成功!!');
+                    window.location.reload();
+                }else {
+                    alert('操作失败!!');
+                    window.location.reload();
+                }
+            }
+        })
+    })
+</script>
+{% block js %}
+{% endblock %}
+</html>

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}
+    <title>我的网站|注册</title>
+{% endblock %}
+{% load user_tags %}
+{% load static %}
+{% block nav_home_active %}
+active
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+            {% if not user.is_authenticated %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">注册</h3>
+                </div>
+                <div class="panel-body">
+                     <form method="POST" action="{% url 'register' %}">
+                        {% csrf_token %}
+                        {% for field in reg_form %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% if field.id_for_label == 'id_email' %}
+                                <div class="input-group">
+                                    {{ field }}
+                                    <span class="input-group-btn">
+                                        <button id="send_code" class="btn btn-default">发送验证码</button>
+                                    </span>
+                                </div>
+                                {% else %}
+                                {{ field }}
+                            {% endif %}
+                        <p class="text-danger">{{ field.errors.as_text }}</p>
+                        {% endfor %}
+                        <span id="tip" class="text-danger">{{ login_form.non_field_errors }}</span>
+                         <div class="clearfix"></div>
+
+                             <div id="embed-captcha"></div>
+                                <p id="wait" class="show">正在加载验证码......</p>
+                                <p id="notice" class="hide">请先拖动验证码到相应位置</p>
+                            <br>
+                            <a href="{% get_login_qq_url %}" id="qq-login">
+                                <img src="{% static 'images/qq.png' %}">
+                                使用QQ登陆
+                             </a>| {% if request.GET.from %}
+                                 <a href="{% url 'login' %}?from={{ request.GET.from }}">前往登陆&gt;&gt;</a>
+                             {% else %}
+                                 <a href="{% url 'login' %}?from={{ request.get_full_path }}">前往登陆&gt;&gt;</a>
+                             {% endif %}
+
+                        <input type="submit" value="注册" class="btn btn-primary pull-right">
+                    </form>
+                </div>
+            </div>
+            {% else %}
+                <span>已登录,跳转到首页...</span>
+                <script>window.location.href=('/');</script>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#send_code").click(function () {
+            var email = $("#id_email").val();
+            if(email==""){
+                $("#tip").text("*邮箱不能为空！");
+            }else{
+                // 发送验证码
+                $.ajax({
+                    url: '{% url 'send_verification_code' %}',
+                    type: 'GET',
+                    data: {
+                        'email': email,
+                        'send_for': 'register_code',
+                    },
+                    cache: false,
+                    success:function (data) {
+                        if(data['status']=='ERROR') {
+                            alert(data['status']);
+                        }
+                    }
+                });
+                // 把按钮变灰倒计时60s
+                $(this).addClass('disabled');
+                $(this).attr('disabled', true);
+                var time = 60;
+                $(this).text(time + 's');
+                var interval = setInterval(()=>{
+                    if(time<=0){
+                        clearInterval(interval);
+                        $(this).removeClass('disabled');
+                        $(this).attr('disabled', false);
+                        $(this).text('发送验证码');
+                        return false;
+                    }
+                        time --;
+                        $(this).text(time + 's');
+                    }, 1000);
+            }
+            });
+    </script>
+
+    <!-- 引入封装了failback的接口--initGeetest -->
+    <script src="//static.geetest.com/static/tools/gt.js"></script>
+
+    <script>
+    var handlerEmbed = function (captchaObj) {
+        $("#embed-submit").click(function (e) {
+            var validate = captchaObj.getValidate();
+            if (!validate) {
+                $("#notice")[0].className = "show";
+                setTimeout(function () {
+                    $("#notice")[0].className = "hide";
+                }, 2000);
+                e.preventDefault();
+            }
+        });
+        // 将验证码加到id为captcha的元素里
+        captchaObj.appendTo("#embed-captcha");
+        captchaObj.onReady(function () {
+            $("#wait")[0].className = "hide";
+        });
+        // 更多接口参考：http://www.geetest.com/install/sections/idx-client-sdk.html
+    };
+    $.ajax({
+        // 获取id，challenge，success（是否启用failback）
+        url: "{% url 'get_captcha' %}?t=" + (new Date()).getTime(), // 加随机数防止缓存
+        type: "get",
+        dataType: "json",
+        success: function (data) {
+            // 使用initGeetest接口
+            // 参数1：配置参数
+            // 参数2：回调，回调的第一个参数验证码对象，之后可以使用它做appendTo之类的事件
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                product: "embed", // 产品形式，包括：float，embed，popup。注意只对PC版验证码有效
+                offline: !data.success // 表示用户后台检测极验服务器是否宕机，一般不需要关注
+            }, handlerEmbed);
+        }
+    });
+</script>
+
+{% endblock %}

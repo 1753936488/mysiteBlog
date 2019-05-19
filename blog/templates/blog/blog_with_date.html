@@ -1,0 +1,9 @@
+{% extends 'blog/blog_list.html' %}
+
+{% block tag %}
+    日期归档:{{ blogs_with_date }}(一共有{{ blog_all|length }}条博客)
+{% endblock %}
+ {# 页面标题 #}
+{% block title %}
+    <title>{{ blogs_with_date }}</title>
+{% endblock %}
