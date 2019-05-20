@@ -13,7 +13,7 @@
 
 <!-- Bootstrap core CSS -->
 <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'index.css' %}">
 <!-- Custom styles for this template -->
 <link href="https://v3.bootcss.com/examples/dashboard/dashboard.css" rel="stylesheet">
 {% block css %}
@@ -230,20 +230,23 @@
 {#              <hr>#}
 {#              <div class="row placeholders" id="cc">#}
 {#               <div id="container" style="width: 800px;height:600px;">adada</div>#}
-    <div class="container-fluid">
+    <div class="container">
+
 		<div class="row">
-			<div class="col-sm-8" style="height:900px;overflow:scroll;" id="dd">
+			<div style="width: 1500px;height:600px;overflow: scroll;" id="dd">
 
-				<hr>
-        </div>
+             </div>
 
-    <div class="col-sm-4 blog-sidebar">
-        <div class="header text-center" style="font-size: 2em;color: red;">推荐菜品</div>
-        <hr>
-        <div class="sidebar-module"style="height:818px;overflow: scroll;" id="cc">
-    </div>
+            <div class="col-sm-pull-4 blog-sidebar">
+                <div class="header text-center" style="width:1400px;font-size: 2em;color: red;">推荐菜品</div>
+                <hr>
+                <div class="sidebar-module"style="width:1500px;height:350px;overflow: scroll;" id="cc">
+            </div>
+
+        <!-- 图表容器 DOM -->
+{#    <div id="container" style="width: 600px;height:400px;"></div>#}
     <!-- 引入 highcharts.js -->
-    <script src="http://cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
+    <script src="//cdn.highcharts.com.cn/highcharts/highcharts.js"></script>
     <script>
         // 图表配置
         var options = {
@@ -270,7 +273,7 @@
             }]
         };
         // 图表初始化函数
-        var chart = Highcharts.chart('container', options);
+        var chart = Highcharts.chart('dd', options);
     </script>
             </div>
 
@@ -309,6 +312,7 @@
                         '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             })
+                        $("#dd").css('overflow','scroll')
                     }else{
                         var htmls = '暂无数据';
                     }
@@ -332,9 +336,10 @@
                         '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
                         '<h4>'+value.dishName+'</h4>'+
                         '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
-                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                        '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             })
+                         $("#dd").css('overflow','scroll')
                     }else{
                         var htmls = '暂无数据';
                     }
@@ -359,9 +364,10 @@
                         '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
                         '<h4>'+value.dishName+'</h4>'+
                         '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
-                                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                                    '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             })
+                         $("#dd").css('overflow','scroll')
                     }else{
                         var htmls = '暂无数据';
                     }
@@ -394,7 +400,7 @@
                         '<img src="'+value.img+'" width="100" height="100" alt="图片不见了">'+
                         '<h4>'+value.dishName+'</h4>'+
                         '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
-                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                        '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             });
 
