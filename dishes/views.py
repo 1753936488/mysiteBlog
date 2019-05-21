@@ -1,8 +1,10 @@
+from django.db.models import Q
 from django.shortcuts import render, redirect
 import pickle
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 
+from dishes.models import Dish
 from . import models
 
 
@@ -140,7 +142,7 @@ def recommend(request):
     #     print(myFpTree.disp())
     with open('myHeaderTable.pk', 'rb') as fp:
         myHeaderTable = pickle.load(fp)
-        print(myHeaderTable)
+        # print(myHeaderTable)
 
     dishIds = ','
     dishId = request.GET.get('pk')
@@ -165,6 +167,7 @@ def recommend(request):
     data = dict()
     data['dishName'] = dish.DishName
     data['price'] = dish.Price
+    data['id'] = dish.pk
     # print('价格', data['price'])
     # print('菜名', data['dishName'])
     # print(dishId)  # 1.根据单菜推荐
@@ -173,6 +176,7 @@ def recommend(request):
     dishIds += history
     result = {'status': 'ok', 'data': data, 'recommend': res}
     response = JsonResponse(result)
+
     response.set_cookie('dishIds', dishIds)
     # response.delete_cookie('dishIds')
     # print(dishIds.split(',')[1:])  # 2：根据所有的菜推荐
@@ -188,10 +192,23 @@ def submitOrder(request):
     dishIds = list(set([int(i) for i in dishIds]))
     od = models.OrderList.objects.create(customer=name)
     dish = models.Dish.objects.filter(pk__in=dishIds)
+    for item in dish:
+        item.Sales += 1
+        item.save()
     od.Dish.add(*dish)
     result = {'status': 'ok'}
     response = JsonResponse(result)
     response.delete_cookie('dishIds')
+    return response
+
+
+def deleteCookie(request):
+    pk = request.GET.get('pk')
+    dishIds = request.COOKIES.get('dishIds', '')
+    dishIds = dishIds.replace(pk, '-1')
+    result = {'status': 'ok'}
+    response = JsonResponse(result)
+    response.set_cookie('dishIds', dishIds)
     return response
 
 
@@ -324,7 +341,6 @@ def createTree(dataSet, minSup=1):
     return retTree, headerTable
 
 
-
 def pickleMyHeaderTable(request):
     simData = loadSimpleData()
     initSet = createInitSet(simData)
@@ -333,4 +349,28 @@ def pickleMyHeaderTable(request):
     with open('myHeaderTable.pk', 'wb') as fp:
         pickle.dump(myHeaderTable, fp)
     return redirect(reverse('index'))
+
+
+def search(request):
+    wd = request.GET.get('wd', '').strip()
+    condition = None
+    for word in wd.split(' '):
+        if condition is None:
+            condition = Q(DishName__icontains=word)
+        else:
+            condition = condition | Q(DishName__icontains=word)
+    if condition is not None:
+        search_dishes = Dish.objects.filter(condition)   # i忽略大小写
+    # context = get_blog_list_common_data(request, search_blogs)
+    res = []
+    for item in search_dishes:
+        data = {}
+        data['id'] = item.pk
+        data['dishName'] = item.DishName
+        data['img'] = item.img
+        data['price'] = item.Price
+        res.append(data)
+    result = {'status': 'ok', 'data': res}
+    return JsonResponse(result)
+
 

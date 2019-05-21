@@ -4,3 +4,25 @@
     margin-left: -3em;
     color: #aaa;
 }
+div.footer{
+    margin-top: 3em;
+    /*margin-left: 220px;*/
+    background-color: #eee;
+    color: #555;
+}
+div.website-info{
+    text-align: center;
+    padding-top: 2em;
+    padding-bottom: 1.5em;
+}
+div.website-info p{
+    margin-bottom: 0;
+}
+.page-bottom{
+    position:absolute;  /*或者fixed*/
+    bottom:0;
+    width:100%;
+}
+ul{
+    list-style: none;
+}

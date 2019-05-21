@@ -39,12 +39,12 @@
             <li><a href="{% url 'pickleMyHeaderTable' %}" >更新模型</a></li>
 
           </ul>
-          <form class="navbar-form navbar-right" id="search-form">
-            <input type="text" class="form-control" placeholder="Search...">
-            <button type="submit" class="btn btn-default">
+          <div class="navbar-form navbar-right" id="search-form">
+            <input type="text" class="form-control" placeholder="请输入关键字" id="wd">
+            <button type="submit" class="btn btn-default" id="search-bar">
                 <span class="glyphicon glyphicon-search"></span>
             </button>
-          </form>
+          </div>
         </div>
       </div>
     </nav>
@@ -237,10 +237,10 @@
 
              </div>
 
-            <div class="col-sm-pull-4 blog-sidebar">
+            <div class="col-sm-pull-4 blog-sidebar hide" id="aa">
                 <div class="header text-center" style="width:1400px;font-size: 2em;color: red;">推荐菜品</div>
                 <hr>
-                <div class="sidebar-module"style="width:1500px;height:350px;overflow: scroll;" id="cc">
+                <div class="sidebar-module "style="width:1500px;height:350px;overflow: scroll;" id="cc">
             </div>
 
         <!-- 图表容器 DOM -->
@@ -254,23 +254,33 @@
                 type: 'bar'                          //指定图表的类型，默认是折线图（line）
             },
             title: {
-                text: '我的第一个图表'                 // 标题
+                text: '菜品销售量'                 // 标题
             },
             xAxis: {
-                categories: ['苹果', '香蕉', '橙子']   // x 轴分类
+                categories: ['当红炸仔鸡(花样年华)', '凤凰展彩堂(蒜蓉蒸扇贝)', '鸳鸯翡翠金腰带(蒜蓉蒸龙虾)','彩衣红袍迎飞舞(日式大拼盘)','东方映鎏金 <大红乳猪全体>']   // x 轴分类
             },
             yAxis: {
                 title: {
-                    text: '吃水果个数'                // y 轴标题
+                    text: '销售量'
                 }
             },
             series: [{                              // 数据列
-                name: '小明',                        // 数据列名
-                data: [1, 0, 4]                     // 数据
-            }, {
-                name: '小红',
-                data: [5, 7, 3]
-            }]
+                name: '销售量',                        // 数据列名
+                data: [10, 30, 40, 33, 28]                     // 数据
+            }],
+            plotOptions:{  //数据标签
+                line:{
+                    dataLabels:{
+                        enabled:true
+                    }
+                }
+            },
+            legend:{
+                enabled:false  //图例禁用
+            },
+            credits:{
+                enabled:false  //版权信息禁用
+            },
         };
         // 图表初始化函数
         var chart = Highcharts.chart('dd', options);
@@ -282,6 +292,13 @@
 
 
       </div>
+    </div>
+
+    <div class="footer">
+        <div class="website-info">
+            <p>© 2019-2020 godyao.club 版权所有 ICP证:湘ICP备19008162号 </p>
+            <p> 意见反馈或联系我(godyao0801@qq.com) </p>
+        </div>
     </div>
 
 <!-- Bootstrap core JavaScript
@@ -309,10 +326,11 @@
                         '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
                         '<h4>'+value.dishName+'</h4>'+
                         '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
-                        '<button type="button" onclick="recommend('+value.id+')">加入订单</button>'+
+                        '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             })
-                        $("#dd").css('overflow','scroll')
+                        $("#dd").css('overflow','scroll');
+                        $("#aa").removeClass('hide');
                     }else{
                         var htmls = '暂无数据';
                     }
@@ -339,7 +357,8 @@
                         '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             })
-                         $("#dd").css('overflow','scroll')
+                         $("#dd").css('overflow','scroll');
+                            $("#aa").removeClass('hide');
                     }else{
                         var htmls = '暂无数据';
                     }
@@ -367,7 +386,8 @@
                                     '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             })
-                         $("#dd").css('overflow','scroll')
+                         $("#dd").css('overflow','scroll');
+                            $("#aa").removeClass('hide');
                     }else{
                         var htmls = '暂无数据';
                     }
@@ -385,7 +405,7 @@
                 if(data.status == 'ok'){
                     // 获取到推荐的标签
                     if(data.recommend.length!=0){
-                            var $li = '<li class="list-group-item">'+data.data.dishName+'<span class="text-danger pull-right price">'+data.data.price+'元</span></li>';
+                            var $li = '<li id="'+data.data.id+'" class="list-group-item"><span class="glyphicon glyphicon-remove text-danger" onclick="remove_li('+data.data.id+')"></span>&nbsp;&nbsp;&nbsp;'+data.data.dishName+'<span class="text-danger pull-right price">'+data.data.price+'元</span></li>';
                             $("#modal-order").append($li);
                             var $price = $(".price");
                             var total = 0;
@@ -403,17 +423,34 @@
                         '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+
                       '</div>'
                             });
-
                     }else{
                         var htmls = '暂无数据';
                     }
                     $("#cc").html(htmls);
-
-
                 }
             }
         })
     }
+    function remove_li(ths){
+        $("#"+ths+"").remove();
+        var $price = $(".price");
+        var total = 0;
+        $.each($price,function (index,value) {
+            var price = value.innerText.split('元')[0];
+            total += parseInt(price);
+        })
+        $("#total-price").html(total);
+        $.ajax({
+            url: 'deleteCookie?pk='+ths,
+            type: 'get',
+            success: function (data) {
+                if(data.status!='ok'){
+                    alert('操作失败!!');
+                }
+            }
+        })
+    };
+
     $("#submit_order").click(function () {
         var name = $("#name").val();
         if(name.length==0){
@@ -435,6 +472,66 @@
             }
         })
     })
+    $("#search-bar").click(function () {
+        var wd = $("#wd").val();
+        $.ajax({
+            url:'search?wd='+wd,
+            type: 'get',
+            cache: 'false',
+            success:function (data) {
+                if(data.status=='ok'){
+                    if(data.data.length!=0){
+                            var htmls = '';
+                            $.each(data.data,function (index,value) {
+                                htmls+='<div class="col-xs-6 col-sm-3 placeholder">'+
+                        '<img src="'+value.img+'" width="200" height="200" alt="图片不见了">'+
+                        '<h4>'+value.dishName+'</h4>'+
+                        '<span class="text-muted" style="font-size:1.3em;color:red;">'+value.price+'元</span>'+
+                        '<br><button class="btn btn-default" type="button" onclick="recommend('+value.id+')">加入订单</button>'+                      '</div>'
+                            })
+                        $("#dd").css('overflow','scroll')
+                    }else{
+                        var htmls = '暂无数据';
+                    }
+                    $("#dd").html(htmls);
+                }
+            }
+
+        })
+
+    })
+                    //底部栏置底
+            //窗体改变大小事件
+            $(window).resize(function(){
+                //正文高度
+                var body_height = $(document.body).outerHeight(true);
+                //底部元素高度
+                var bottom_height = $(".footer").outerHeight(true);
+                //浏览器页面高度
+                var window_height = $(window).height();
+                //判断并调整底部元素的样式
+                if($(".footer").hasClass('page-bottom')){
+
+                    //若包含有page-bottom类，就应用了position设置
+                    //当position为absolute时，body高度不包含这个元素
+                    //所以页面高度需要判断body和footer之和若小于浏览器窗口
+                    //则移除样式，让footer自然跟随在正文后面
+                    if(body_height + bottom_height >= window_height){
+
+                        $(".footer").removeClass('page-bottom');
+                    }
+
+                }else{
+                    //若没有page-bottom类，body高度包含footer
+                    //判断body高度小于浏览器时，则悬浮于底部
+                    if(body_height < window_height){
+
+                        $(".footer").addClass('page-bottom');
+                    }
+                }
+            });
+            //页面加载时，模拟触发一下resize事件
+            $(window).trigger('resize');
 </script>
 {% block js %}
 {% endblock %}

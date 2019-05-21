@@ -11,4 +11,6 @@ urlpatterns = [
     path('recommend', views.recommend, name='recommend'),
     path('submitOrder', views.submitOrder, name='submitOrder'),
     path('pickleMyHeaderTable', views.pickleMyHeaderTable, name='pickleMyHeaderTable'),
+    path('search', views.search, name='searchDish'),
+    path('deleteCookie', views.deleteCookie, name='deleteCookie'),
 ]
