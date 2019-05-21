@@ -85,8 +85,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'blog',
         'USER': 'root',
-        'PASSWORD': 'a',
-        # 'HOST': '120.78.181.188',
+        'PASSWORD': '',
+    
         'HOST': 'localhost',
         'PORT': '3306',
 
@@ -172,9 +172,9 @@ CACHES = {
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.qq.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = '1753936488@qq.com'
-EMAIL_HOST_PASSWORD = 'cwamxiblhkctfabj'  # 授权码
-EMAIL_SUBJECT_PREFIX = '[王耀的博客]'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''  # 授权码
+EMAIL_SUBJECT_PREFIX = '['
 EMAIL_USE_TLS = True  # 与SMTP服务器通信时，是否启动TLS链接（安全链接）
 # simpleui 设置
 
@@ -233,7 +233,7 @@ EMAIL_USE_TLS = True  # 与SMTP服务器通信时，是否启动TLS链接（安�
 #     }]
 # }
 #  qq登陆设置
-QQ_APP_ID = '101577150'
-QQ_APP_KEY = 'e8dc78f69236b398fba8d86a74c68fa2'
-QQ_REDIRECT_URL = 'http://godyao.club/user/login_by_qq'
-QQ_STATE = '再敲一行代码'
+QQ_APP_ID = ''
+QQ_APP_KEY = ''
+QQ_REDIRECT_URL = ''
+QQ_STATE = ''
